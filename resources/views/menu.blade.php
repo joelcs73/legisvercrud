@@ -17,6 +17,7 @@
               <a class="dropdown-item" target="_blank" href="/api/legislaturas">Cat. legislaturas</a>
               <div class="dropdown-divider"></div> 
               <a class="dropdown-item" target="_blank" href="/api/diputadoslegislatura">Diputados Legislatura actual</a>
+              <a class="dropdown-item" target="_blank" href="/api/mesadirectiva">Mesa directiva</a>
             </div>
         </li>
 
@@ -24,7 +25,7 @@
           <a class="nav-link dropdown-toggle" href="/" id="menu2" data-toggle="dropdown">Administración</a>
           <div class="dropdown-menu dropdown-menu-left" aria-labelledby="menu2">
             <a class="dropdown-item" href="/legisladores">Lista de Legisladores</a>
-            <a class="dropdown-item" href="/licencias">Licencias</a> 
+            <a class="dropdown-item" href="/legisladores/mesadirectiva">Mesa directiva</a> 
           </div>
         </li>
       </ul>

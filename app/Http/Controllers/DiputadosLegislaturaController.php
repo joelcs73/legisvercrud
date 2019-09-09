@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DiputadosLegislatura;
 use App\Diputado;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 
 class DiputadosLegislaturaController extends Controller
@@ -46,10 +47,30 @@ class DiputadosLegislaturaController extends Controller
      */
     public function show($numleg)
     {
-        $diputados=$this->diputadosLegislaturaJson($numleg);
-        echo json_encode($diputados);
+        $condiciones = [
+            ['diputadoslegislatura.status','=',1],
+            ['cat_legislaturas.clave','=',$numleg]];
+            $diputados=$this->diputadosLegislaturaJson($condiciones);
+            echo json_encode($diputados);
+        }
+        
+        
+        /**
+         * Display the specified resource.
+         *
+         * @param  \App\prueba  $prueba
+         * @return \Illuminate\Http\Response
+     */
+    public function mesaDirectiva(){
+        $numleg = $this->ultimaLegislatura();
+        $condiciones = [
+            ['diputadoslegislatura.status','=',1],
+            ['cat_legislaturas.clave','=',$numleg],
+            ['cat_diputados.cargo', 'like', '%mesa directiva%']
+        ];
+        $mesadirectiva=$this->diputadosLegislaturaJson($condiciones);
+        echo json_encode($mesadirectiva);
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -81,7 +102,7 @@ class DiputadosLegislaturaController extends Controller
         $diplegis->delete();
     }
 
-    private function ultimaLegislatura(){
+    public function ultimaLegislatura(){
         $claveLeg = DB::table('cat_legislaturas')
         ->orderBy('idLegislatura','desc')
         ->first();
@@ -89,13 +110,14 @@ class DiputadosLegislaturaController extends Controller
         return $leg;
     }
 
-    private function diputadosLegislaturaJson($numleg){
+    public function diputadosLegislaturaJson($condiciones){
         $dl = DB::table('diputadoslegislatura')
         ->leftjoin('cat_legislaturas', 'diputadoslegislatura.idLegislatura', '=', 'cat_legislaturas.idLegislatura')
         ->leftjoin('cat_diputados', 'diputadoslegislatura.idDiputado', '=', 'cat_diputados.idDiputado')
         ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
         ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
         ->select(
+            'diputadoslegislatura.id',
             'cat_legislaturas.idLegislatura',
             'diputadoslegislatura.idDiputado',
             'diputadoslegislatura.idPartido',
@@ -124,23 +146,13 @@ class DiputadosLegislaturaController extends Controller
             'cat_partidospoliticos.nombre as nombrePartido',
             'cat_partidospoliticos.archivoimagen as logoPartido'
             )
-        ->where([
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg]
-        ])
+        ->where($condiciones)
         ->orderBy('cat_partidospoliticos.orden')
         ->orderBy('cat_diputados.ordenNivel')
         ->orderBy('cat_diputados.paterno')
         ->get();
 
         return $dl;
-    }
-
-    public function nombreDiputadosCombo(){
-        $diputados=$this->diputadosLegislaturaJson($this->ultimaLegislatura());
-
-        return view('licencias')
-        ->with('diputados',$diputados);
     }
 
     public function licencia($idDip){

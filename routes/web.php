@@ -24,8 +24,13 @@ Route::get('/', function () {
 // Route::get('','UsuarioController@opcionesmenu');
 
 // Route::get('/menu','UsuarioController@opcionesmenu');
-Route::get('/legisladores/','LegisladorController@index');
-// Route::get('/licencias','DiputadoController@nombreDiputadosCombo');
-Route::get('/licencias','DiputadosLegislaturaController@nombreDiputadosCombo');
 
-Route::get('/legisladores/{idDiputado}','DiputadosLegislaturaController@licencia')->name('diputado.licencia');
+
+Route::get('/legisladores/','LegisladorController@index');
+
+Route::get('/legisladores/licencia/{idDiputado}','DiputadosLegislaturaController@licencia')->name('diputado.licencia');
+
+Route::get('/legisladores/edita/{idDiputado}','LegisladorController@edita')->name('diputado.edita');
+
+Route::get('/legisladores/mesadirectiva','LegisladorController@mesaDirectiva');
+

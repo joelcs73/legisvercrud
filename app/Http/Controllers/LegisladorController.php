@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Controllers\DiputadosLegislaturaController;
 use App\Legislador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,55 +14,47 @@ class LegisladorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   
+        $oDl = new DiputadosLegislaturaController();
         $claveLeg = DB::table('cat_legislaturas')
         ->orderBy('idLegislatura','desc')
         ->first();
         $numleg = (string) $claveLeg->clave;
         
-
-        $diputados = DB::table('diputadoslegislatura')
-        ->leftjoin('cat_legislaturas', 'diputadoslegislatura.idLegislatura', '=', 'cat_legislaturas.idLegislatura')
-        ->leftjoin('cat_diputados', 'diputadoslegislatura.idDiputado', '=', 'cat_diputados.idDiputado')
-        ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
-        ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
-        ->select(
-            'diputadoslegislatura.id',
-            'diputadoslegislatura.idDiputado',
-            'cat_legislaturas.nombre as legislatura', 
-            'cat_legislaturas.clave as numeroLegislatura', 
-            DB::raw('CONCAT(cat_diputados.nombre," ",cat_diputados.paterno," ",cat_diputados.materno) as nombreDiputado'),
-            DB::raw('(
-                case
-                    when cat_diputados.suplenteDe = 0 then "Propietario"
-                    else "Suplente"
-                end) as tipoDeCargo'),
-            DB::raw('(
-                case
-                    when cat_distritos.numero = 99 then "Representación proporcional"
-                    else "Mayoría relativa"
-                end) as tipoDeEleccion'),
-            'cat_diputados.cargo',
-            'cat_diputados.foto',
-            'cat_diputados.extension',
-            'cat_diputados.correo',
-            'cat_distritos.numero as numeroDistrito',
-            DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) as nombreDistrito'),
-            'cat_partidospoliticos.siglas as siglasPartido',
-            'cat_partidospoliticos.nombre as nombrePartido',
-            'cat_partidospoliticos.archivoimagen as logoPartido',
-            )
-        ->where([
+        $condiciones = [
             ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg]
-        ])
-        ->orderBy('cat_partidospoliticos.orden')
-        ->orderBy('cat_diputados.ordenNivel')
-        ->orderBy('cat_diputados.paterno')
-        ->get();
+            ['cat_legislaturas.clave','=',$numleg]];
+            $dips = $oDl->diputadosLegislaturaJson($condiciones);
+            
+            return view('legisladores')
+            ->with('diputados',$dips);
+        }
+        
+        public function mesaDirectiva(){
+            $oDl = new DiputadosLegislaturaController();
+            $numleg = $oDl->ultimaLegislatura();
+            $condiciones = [
+                ['diputadoslegislatura.status','=',1],
+                ['cat_legislaturas.clave','=',$numleg],
+                ['cat_diputados.cargo', 'like', '%mesa directiva%']
+            ];
+            $mesadirectiva=$oDl->diputadosLegislaturaJson($condiciones);
+            return view('mesadirectiva')
+            ->with('diputados',$mesadirectiva);
+    }
 
-         return view('legisladores')
-         ->with('diputados',$diputados);
+
+    public function edita($idDip){
+        $oDl = new DiputadosLegislaturaController();
+        $numleg = $oDl->ultimaLegislatura();
+        $condiciones = [
+            ['diputadoslegislatura.status','=',1],
+            ['cat_legislaturas.clave','=',$numleg],
+            ['cat_diputados.idDiputado', '=', $idDip]
+        ];
+        $diputado=$oDl->diputadosLegislaturaJson($condiciones)->first();
+        return view('editalegislador')
+        ->with('diputado',$diputado);
     }
 
     /**

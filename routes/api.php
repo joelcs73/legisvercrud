@@ -29,12 +29,12 @@ Route::get('diputadoslegislatura/{numleg}', function ($numleg){
     DiputadosLegislaturaController::show($numleg);
 });
 
-Route::get('diputadoslegislatura/inicialicencia/{numleg}', function ($idDiputado){
-    // return 'Terminará la licencia del diputado '.$numleg;
-    DiputadosLegislaturaController::inicialicencia($idDiputado);
+Route::get('mesadirectiva',function (){
+    $oDl = new DiputadosLegislaturaController();
+    $oDl->mesaDirectiva($oDl->ultimaLegislatura());
 });
 
-Route::get('diputadoslegislatura/terminalicencia/{numleg}', function ($idDiputado){
-    // return 'Terminará la licencia del diputado '.$numleg;
-    DiputadosLegislaturaController::terminalicencia($idDiputado);
+Route::get('mesadirectiva/{numleg}',function ($numleg){
+    $oDl = new DiputadosLegislaturaController();
+    $oDl->mesaDirectiva($numleg);
 });

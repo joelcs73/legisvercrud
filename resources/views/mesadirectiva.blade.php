@@ -1,5 +1,5 @@
 @extends('welcome')
-@section('titulo','Legisladores')
+@section('titulo','Mesa directiva')
 @section('Contenido')
    
 @if ($diputados!=[])
@@ -15,8 +15,7 @@
             <th scope="col">Distrito</th>
             <th scope="col">Tipo de elección</th>
             <th scope="col">Tipo de cargo</th>
-            <th scope="col">Editar</th>
-            <th scope="col">Licencia</th>
+            {{--  <th scope="col">Licencia</th>  --}}
         </tr>
         </thead>
         <tbody>
@@ -31,16 +30,11 @@
                     <td>{{ $diputado->nombreDistrito }}</td>
                     <td>{{ $diputado->tipoDeEleccion }}</td>
                     <td>{{ $diputado->tipoDeCargo }}</td>
-                    <td class="text-center">
-                            <a class="btn btn-outline-dark" href="{{ route('diputado.edita', ['diputado' => $diputado->idDiputado]) }}">
-                                <span class="oi oi-pencil"></span>
-                            </a>
-                        </td>
-                    <td class="text-center">
+                    {{--  <td class="text-center">
                         <a class="btn btn-outline-dark" href="{{ route('diputado.licencia', ['diputado' => $diputado->idDiputado]) }}">
                             <span class="oi oi-loop-circular"></span>
                         </a>
-                    </td>
+                    </td>  --}}
                 </tr>
                 @php $num ++; @endphp
             @endforeach
