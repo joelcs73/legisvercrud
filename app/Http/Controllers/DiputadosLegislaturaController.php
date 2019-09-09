@@ -177,53 +177,49 @@ class DiputadosLegislaturaController extends Controller
             echo 'Es suplente de '.$dip1->nombre.' '.$dip1->paterno.' '.$dip1->materno.' con id ' . $idSup . '</br>';
         }
         
-        // dd(1);
         $this->diputadoLicencia($idDip,$idSup);
 
         return redirect('legisladores');
     }
 
     private function diputadoLicencia($idSale,$idEntra){
+        // Encontramos el idDiputado del saliente en la tabla diputadoslegislatura para obtener todos los datos
         $tabDipSaliente = DB::table('diputadoslegislatura')->select('diputadoslegislatura.*')->where('idDiputado','=',$idSale)->get();
-        $diplegis = DB::table('diputadoslegislatura')->select('diputadoslegislatura.*')->where('idDiputado','=',$idSale)->get();
-        
         $idLegislatura = 0;
-        foreach($tabDipSaliente as $dipSal){
-            $idLegislatura = $dipSal->idLegislatura;
-            $idPartido = $dipSal->idPartido;
-            $idRegistro = $dipSal->id;
+        foreach($tabDipSaliente as $dipSaliente){
+            $idRegistro = $dipSaliente->id;
+            $idLegislatura = $dipSaliente->idLegislatura;
+            $idDipSaliente = $idSale;
+            $idPartido = $dipSaliente->idPartido;
+            $perm = $dipSaliente->permanente;
         }
-        foreach($diplegis as $datoDip){
-            $idDip = $datoDip->idDiputado;
-            $perm = $datoDip->permanente;
-        }
-
+        
+        // Cambiamos el estatus del diputado saliente a 0
         $objDipSaliente = DiputadosLegislatura::find($idRegistro);
         $objDipSaliente->idLegislatura = $idLegislatura;
-        $objDipSaliente->idDiputado = $idDip;
+        $objDipSaliente->idDiputado = $idDipSaliente;
         $objDipSaliente->idPartido = $idPartido;
         $objDipSaliente->status = 0;
         $objDipSaliente->permanente = $perm;
         $objDipSaliente->save();
 
-        $objDipSaliente = DiputadosLegislatura::find($idEntra);
-        if(!empty($objDipSaliente)){
-            // $diplegis = DiputadosLegislatura::find($idEntra);
-            $objDipSaliente->idLegislatura = $objDipSaliente->idLegislatura;
-            $objDipSaliente->idDiputado = $objDipSaliente->idDiputado;
-            $objDipSaliente->idPartido = $objDipSaliente->idPartido;
-            $objDipSaliente->status = 1;
-            $objDipSaliente->permanente = $objDipSaliente->permanente;
-            // $objDipSaliente->save();
-        } else {
-            $objDipSaliente = new DiputadosLegislatura();
-            $objDipSaliente->idLegislatura = $idLegislatura;
-            $objDipSaliente->idDiputado = $idEntra;
-            $objDipSaliente->idPartido = $idPartido;
-            $objDipSaliente->status = 1;
-            $objDipSaliente->permanente = 0;
+        // Buscamos en la tabla diputadoslegislatura el id del diputado que entrará
+        $tabDipEntrante = DB::table('diputadoslegislatura')->select('diputadoslegislatura.*')->where('idDiputado','=',$idEntra)->get();
+        $idRegistroEntrante=0;
+        foreach($tabDipEntrante as $dipEntrante){
+            $idRegistroEntrante = $dipEntrante->id;
         }
-        // dd($objDipSaliente);
-        $objDipSaliente->save();
+        // dd($idRegistroEntrante, $idEntra, $tabDipEntrante, empty($tabDipEntrante));
+        if($idRegistroEntrante==0){
+            $objDipEntrante = new DiputadosLegislatura();
+        } else {
+            $objDipEntrante = DiputadosLegislatura::find($idRegistroEntrante);
+        }
+        $objDipEntrante->idLegislatura = $idLegislatura;
+        $objDipEntrante->idDiputado = $idEntra;
+        $objDipEntrante->idPartido = $idPartido;
+        $objDipEntrante->status = 1;
+        $objDipEntrante->permanente = 0;
+        $objDipEntrante->save();
     }
 }

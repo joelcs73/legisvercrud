@@ -10,6 +10,6 @@ class DiputadosLegislatura extends Model
     y espera tener los campos de creación y modificación de registro.
     Con estas sentencias personalizamos.*/
     protected $table = 'diputadoslegislatura';
-    protected $primaryKey = 'idDiputado';
+    protected $primaryKey = 'id';
     public $timestamps = false;
 }

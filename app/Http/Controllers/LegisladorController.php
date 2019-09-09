@@ -27,6 +27,7 @@ class LegisladorController extends Controller
         ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
         ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
         ->select(
+            'diputadoslegislatura.id',
             'diputadoslegislatura.idDiputado',
             'cat_legislaturas.nombre as legislatura', 
             'cat_legislaturas.clave as numeroLegislatura', 

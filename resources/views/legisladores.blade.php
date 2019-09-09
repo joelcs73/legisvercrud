@@ -7,6 +7,9 @@
     <table class="table table-sm table-hover">
         <thead class="thead-dark">
         <tr>
+            <th scope="col">#</th>
+            {{--  <th scope="col">idDiputadoLegislatura</th>  --}}
+            {{--  <th scope="col">idDiputado</th>  --}}
             <th scope="col">Diputado(a)</th>
             <th scope="col">Partido</th>
             <th scope="col">Distrito</th>
@@ -16,8 +19,12 @@
         </tr>
         </thead>
         <tbody>
+            @php $num = 1;  @endphp
             @foreach ($diputados as $diputado)
                 <tr class="">
+                    <th>{{ $num }}</th>
+                    {{--  <th>{{ $diputado->id }}</th>  --}}
+                    {{--  <th>{{ $diputado->idDiputado }}</th>  --}}
                     <th>{{ $diputado->nombreDiputado }}</th>
                     <td>{{ $diputado->nombrePartido }}</td>
                     <td>{{ $diputado->nombreDistrito }}</td>
@@ -29,6 +36,7 @@
                         </a>
                     </td>
                 </tr>
+                @php $num ++; @endphp
             @endforeach
         </tbody>
     </table>
