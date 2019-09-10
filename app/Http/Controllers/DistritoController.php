@@ -15,7 +15,8 @@ class DistritoController extends Controller
     public function index()
     {
         $distritos = Distrito::get();
-        echo json_encode($distritos);
+        return $distritos;
+        // echo json_encode($distritos);
     }
 
     /**
@@ -63,4 +64,8 @@ class DistritoController extends Controller
     {
         $distrito = Distrito::find($idDistrito);
         $distrito->delete();    }
+
+    public function comboDistritos(){
+
+    }
 }

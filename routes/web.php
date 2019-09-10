@@ -31,6 +31,7 @@ Route::get('/legisladores/','LegisladorController@index');
 Route::get('/legisladores/licencia/{idDiputado}','DiputadosLegislaturaController@licencia')->name('diputado.licencia');
 
 Route::get('/legisladores/edita/{idDiputado}','LegisladorController@edita')->name('diputado.edita');
+Route::get('/guardalegislador/{idDiputado}','LegisladorController@update');
 
 Route::get('/legisladores/mesadirectiva','LegisladorController@mesaDirectiva');
 

@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Controllers\DiputadosLegislaturaController;
-use App\Legislador;
+use App\Http\Controllers\DiputadoController;
+use App\Http\Controllers\DistritoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,61 +45,28 @@ class LegisladorController extends Controller
             ->with('diputados',$mesadirectiva);
     }
 
-
     public function edita($idDip){
         $oDl = new DiputadosLegislaturaController();
         $numleg = $oDl->ultimaLegislatura();
-        $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg],
-            ['cat_diputados.idDiputado', '=', $idDip]
-        ];
-        $diputado=$oDl->diputadosLegislaturaJson($condiciones)->first();
-        return view('editalegislador')
-        ->with('diputado',$diputado);
-    }
+        $condiciondiputado = [['diputadoslegislatura.status','=',1],['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $idDip]];
+        $condicionPropietarios = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.suplenteDe','=',0]];
+        $diputado=$oDl->diputadosLegislaturaJson($condiciondiputado)->first();
+        $diputadosPropietarios=$oDl->diputadosLegislaturaJson($condicionPropietarios);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+        if(empty($diputado)){
+            return view('rutainvalida');
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $oDist = new DistritoController();
+        $distritos = $oDist->index();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Legislador  $legislador
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Legislador $legislador)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Legislador  $legislador
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Legislador $legislador)
-    {
-        //
+        return view('editalegislador',
+            [
+                'diputado' => $diputado,
+                'diputados' => $diputadosPropietarios,
+                'distritos' => $distritos
+            ]
+        );
     }
 
     /**
@@ -107,19 +76,12 @@ class LegisladorController extends Controller
      * @param  \App\Legislador  $legislador
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Legislador $legislador)
+    public function update(Request $request, $idDiputado)
     {
-        //
+        $diputado = new DiputadoController();
+        $diputado->update($request,$idDiputado);
+        return redirect('legisladores');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Legislador  $legislador
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Legislador $legislador)
-    {
-        //
-    }
+
 }

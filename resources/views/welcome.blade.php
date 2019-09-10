@@ -24,7 +24,7 @@
     <body>
       <div class="container">
           @include('menu')
-          <h1>@yield('titulo')</h1>
+          <h5>@yield('titulo')<span class="badge badge-dark">@yield('subtitulo')</span></h5>
           @yield('Contenido')
       </div>
     </body>

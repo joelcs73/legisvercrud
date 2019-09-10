@@ -38,6 +38,7 @@ class DiputadoController extends Controller
         $diputado->paterno = $request->input('paterno');
         $diputado->materno = $request->input('materno');
         $diputado->extension = $request->input('extension');
+        $diputado->cargo = $request->input('cargo');
         $diputado->correo = $request->input('correo');
         $diputado->foto = $request->input('foto');
         $diputado->cvPdf = $request->input('cvPdf');
@@ -67,6 +68,7 @@ class DiputadoController extends Controller
         $diputado->paterno = $request->input('paterno');
         $diputado->materno = $request->input('materno');
         $diputado->extension = $request->input('extension');
+        $diputado->cargo = $request->input('cargo');
         $diputado->correo = $request->input('correo');
         $diputado->foto = $request->input('foto');
         $diputado->cvPdf = $request->input('cvPdf');

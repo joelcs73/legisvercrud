@@ -125,6 +125,9 @@ class DiputadosLegislaturaController extends Controller
             'diputadoslegislatura.permanente',
             'cat_legislaturas.nombre as legislatura', 
             'cat_legislaturas.clave as numeroLegislatura', 
+            'cat_diputados.paterno',
+            'cat_diputados.materno',
+            'cat_diputados.nombre',
             DB::raw('CONCAT(cat_diputados.nombre," ",cat_diputados.paterno," ",cat_diputados.materno) as nombreDiputado'),
             DB::raw('(
                 case
@@ -140,6 +143,10 @@ class DiputadosLegislaturaController extends Controller
             'cat_diputados.foto',
             'cat_diputados.extension',
             'cat_diputados.correo',
+            'cat_diputados.cvPdf',
+            'cat_diputados.idDistrito',
+            'cat_diputados.suplenteDe',
+            'cat_diputados.ordenNivel',
             'cat_distritos.numero as numeroDistrito',
             DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) as nombreDistrito'),
             'cat_partidospoliticos.siglas as siglasPartido',
