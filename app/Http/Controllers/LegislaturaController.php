@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Legislatura;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LegislaturaController extends Controller
 {
@@ -65,5 +66,13 @@ class LegislaturaController extends Controller
     {
         $legislatura = Legislatura::find($idLegislatura);
         $legislatura->delete();
+    }
+
+    public function ultimaLegislatura(){
+        $claveLeg = DB::table('cat_legislaturas')
+        ->orderBy('idLegislatura','desc')
+        ->first();
+        $leg = (string) $claveLeg->clave;
+        return $leg;
     }
 }

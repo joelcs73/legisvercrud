@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 // Auth::routes();
@@ -26,12 +26,14 @@ Route::get('/', function () {
 // Route::get('/menu','UsuarioController@opcionesmenu');
 
 
-Route::get('/legisladores/','LegisladorController@index');
+Route::get('/legisladores/','DiputadoController@showweb');
 
 Route::get('/legisladores/licencia/{idDiputado}','DiputadosLegislaturaController@licencia')->name('diputado.licencia');
+Route::get('/guardalicencia','DiputadosLegislaturaController@guardalicencia');
 
-Route::get('/legisladores/edita/{idDiputado}','LegisladorController@edita')->name('diputado.edita');
-Route::get('/guardalegislador/{idDiputado}','LegisladorController@update');
+Route::get('/legisladores/edita/{idDiputado}','DiputadoController@edita')->name('diputado.edita');
+Route::get('/guardalegislador/{idDiputado}','DiputadoController@actualiza');
 
-Route::get('/legisladores/mesadirectiva','LegisladorController@mesaDirectiva');
+Route::get('/legisladores/mesadirectiva','MesaDirectivaController@show');
+
 

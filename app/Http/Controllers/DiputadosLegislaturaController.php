@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DiputadosLegislatura;
-use App\Diputado;
+use App\Http\Controllers\LegislaturaController;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
@@ -17,8 +17,24 @@ class DiputadosLegislaturaController extends Controller
      */
     public function index()
     {
-        $leg = $this->ultimaLegislatura();
+        $oLegislatura = new LegislaturaController();
+        $leg = $oLegislatura->ultimaLegislatura();
         return redirect('api/diputadoslegislatura/'.$leg);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\DiputadosLegislatura  $diputadosLegislatura
+     * @return \Illuminate\Http\Response
+     */
+    public function show($numleg)
+    {
+        $condiciones = [
+            ['diputadoslegislatura.status','=',1],
+            ['cat_legislaturas.clave','=',$numleg]];
+            $diputados=$this->diputadosLegislaturaJson($condiciones);
+            echo json_encode($diputados);
     }
 
     /**
@@ -39,38 +55,9 @@ class DiputadosLegislaturaController extends Controller
         echo json_encode($diplegis);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\prueba  $prueba
-     * @return \Illuminate\Http\Response
-     */
-    public function show($numleg)
-    {
-        $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg]];
-            $diputados=$this->diputadosLegislaturaJson($condiciones);
-            echo json_encode($diputados);
-        }
+
         
-        
-        /**
-         * Display the specified resource.
-         *
-         * @param  \App\prueba  $prueba
-         * @return \Illuminate\Http\Response
-     */
-    public function mesaDirectiva(){
-        $numleg = $this->ultimaLegislatura();
-        $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg],
-            ['cat_diputados.cargo', 'like', '%mesa directiva%']
-        ];
-        $mesadirectiva=$this->diputadosLegislaturaJson($condiciones);
-        echo json_encode($mesadirectiva);
-    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -102,12 +89,55 @@ class DiputadosLegislaturaController extends Controller
         $diplegis->delete();
     }
 
-    public function ultimaLegislatura(){
-        $claveLeg = DB::table('cat_legislaturas')
-        ->orderBy('idLegislatura','desc')
-        ->first();
-        $leg = (string) $claveLeg->clave;
-        return $leg;
+    public function distritosOcupados($condiciones){
+        $dl = DB::table('diputadoslegislatura')
+        ->leftjoin('cat_legislaturas', 'diputadoslegislatura.idLegislatura', '=', 'cat_legislaturas.idLegislatura')
+        ->leftjoin('cat_diputados', 'diputadoslegislatura.idDiputado', '=', 'cat_diputados.idDiputado')
+        ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
+        ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
+        ->select(
+            'diputadoslegislatura.id',
+            'cat_legislaturas.idLegislatura',
+            'diputadoslegislatura.idDiputado',
+            'diputadoslegislatura.idPartido',
+            'diputadoslegislatura.status',
+            'diputadoslegislatura.permanente',
+            'cat_legislaturas.nombre as legislatura', 
+            'cat_legislaturas.clave as numeroLegislatura', 
+            'cat_diputados.paterno',
+            'cat_diputados.materno',
+            'cat_diputados.nombre',
+            DB::raw('CONCAT(cat_diputados.paterno," ",cat_diputados.materno," ",cat_diputados.nombre) as nombreDiputado'),
+            DB::raw('(
+                case
+                    when cat_diputados.suplenteDe = 0 then "Propietario"
+                    else "Suplente"
+                end) as tipoDeCargo'),
+            DB::raw('(
+                case
+                    when cat_distritos.numero = 99 then "Representación proporcional"
+                    else "Mayoría relativa"
+                end) as tipoDeEleccion'),
+            'cat_diputados.cargo',
+            'cat_diputados.foto',
+            'cat_diputados.extension',
+            'cat_diputados.correo',
+            'cat_diputados.cvPdf',
+            'cat_diputados.idDistrito',
+            'cat_diputados.suplenteDe',
+            'cat_diputados.ordenNivel',
+            'cat_distritos.numero as numeroDistrito',
+            DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) as nombreDistrito'),
+            'cat_partidospoliticos.siglas as siglasPartido',
+            'cat_partidospoliticos.nombre as nombrePartido',
+            'cat_partidospoliticos.archivoimagen as logoPartido'
+            )
+        ->where($condiciones)
+        ->orderBy('cat_distritos.numero')
+        ->orderBy('cat_diputados.nombre')
+        ->get();
+
+        return $dl;
     }
 
     public function diputadosLegislaturaJson($condiciones){
@@ -163,45 +193,51 @@ class DiputadosLegislaturaController extends Controller
     }
 
     public function licencia($idDip){
-        $diputadoActivo = Diputado::find($idDip);
-        $tipoDeCargo="";
-        if($diputadoActivo->suplenteDe==0){
-            $tipoDeCargo = "Propietario";
-        } else {
-            $tipoDeCargo = "Suplente";
-        }
-        
-        $diputadoSuplente = DB::table('cat_diputados')->select('cat_diputados.*')->where('suplenteDe','=',$idDip)->get();
-        $diputadoSuplenteEnTabla = DiputadosLegislatura::find($idDip);
+        // código para tratar la licencia en una vista
 
-        $yaExisteSuplente = false;
-        if(!empty($diputadoSuplenteEnTabla)){
-            $yaExisteSuplente=true;
-        }
+        // Obtenemos de la tabla [diputadoslegislatura] los datos del diputado que se irá de licencia
+        $oLegislatura = new LegislaturaController();
+        $numleg = $oLegislatura->ultimaLegislatura();
+        $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $idDip]];
+        $diputadoSale = $this->diputadosLegislaturaJson($condiciondiputado)->first();
+        if(empty($diputadoSale)){ return view('rutainvalida'); }
+        if($diputadoSale->status==0){ return view('rutainvalida'); }
 
-        $idSup=0;
-        $nomSup="";
-        if(!empty($diputadoSuplente)){
-            foreach($diputadoSuplente as $dipSuplente){
-                $idSup = $dipSuplente->idDiputado;
-                $nomSup = $dipSuplente->nombre.' '.$dipSuplente->paterno.' '.$dipSuplente->materno;
+        $diputadoEntraYaHaOcupadoCurul = true;
+        if($diputadoSale->suplenteDe==0){ 
+            // Aquí el diputado saliente es Propietario
+
+            // Obtenemos el diputado que es su suplente
+            $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
+            $diputadoEntra = $this->diputadosLegislaturaJson($condiciondiputado)->first();
+            if(empty($diputadoEntra)){
+                $diputadoEntraYaHaOcupadoCurul = false;
+                $diputadoEntra = DB::table('cat_diputados')->select('cat_diputados.*')->where('suplenteDe','=',$idDip)->get()->first();
             }
-        }
-        echo 'Diputado activo ' .$diputadoActivo->nombre.' '.$diputadoActivo->paterno.' '.$diputadoActivo->materno.' con id ' . $idDip . '</br>';
-        if($nomSup!=""){
-            echo 'Su suplente es '.$nomSup.' con id ' . $idSup;
-        } else {
-            $dip1 = Diputado::find($diputadoActivo->suplenteDe);
-            $idSup=$diputadoActivo->suplenteDe;
-            echo 'Es suplente de '.$dip1->nombre.' '.$dip1->paterno.' '.$dip1->materno.' con id ' . $idSup . '</br>';
-        }
-        
-        $this->diputadoLicencia($idDip,$idSup);
 
-        return redirect('legisladores');
+        } else { 
+            // Aquí el diputado saliente es Suplente
+
+            // Obtenemos el diputado que es propietario
+            $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
+            $diputadoEntra = $this->diputadosLegislaturaJson($condiciondiputado)->first();
+
+        }
+        return view('legisladores/gestionalicencia',
+            [
+                'diputadoSale' => $diputadoSale,
+                'diputadoEntra' => $diputadoEntra,
+                'diputadoEntraYaHaOcupadoCurul' => $diputadoEntraYaHaOcupadoCurul
+
+            ]
+        );
     }
 
-    private function diputadoLicencia($idSale,$idEntra){
+    public function guardalicencia(request $request){
+        $idSale = $request->input('idSale');
+        $idEntra = $request->input('idEntra');
+        $esIntercambio = $request->input('esIntercambio');
+
         // Encontramos el idDiputado del saliente en la tabla diputadoslegislatura para obtener todos los datos
         $tabDipSaliente = DB::table('diputadoslegislatura')->select('diputadoslegislatura.*')->where('idDiputado','=',$idSale)->get();
         $idLegislatura = 0;
@@ -222,6 +258,10 @@ class DiputadosLegislaturaController extends Controller
         $objDipSaliente->permanente = $perm;
         $objDipSaliente->save();
 
+        if($esIntercambio==null){
+            return redirect('legisladores');
+        }
+
         // Buscamos en la tabla diputadoslegislatura el id del diputado que entrará
         $tabDipEntrante = DB::table('diputadoslegislatura')->select('diputadoslegislatura.*')->where('idDiputado','=',$idEntra)->get();
         $idRegistroEntrante=0;
@@ -240,5 +280,7 @@ class DiputadosLegislaturaController extends Controller
         $objDipEntrante->status = 1;
         $objDipEntrante->permanente = 0;
         $objDipEntrante->save();
+
+        return redirect('legisladores');
     }
 }

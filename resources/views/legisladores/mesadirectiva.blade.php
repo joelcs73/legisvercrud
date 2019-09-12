@@ -1,4 +1,4 @@
-@extends('welcome')
+@extends('index')
 @section('titulo','Mesa directiva')
 @section('Contenido')
    

@@ -19,6 +19,8 @@ class DistritoController extends Controller
         // echo json_encode($distritos);
     }
 
+
+    
     /**
      * Store a newly created resource in storage.
      *

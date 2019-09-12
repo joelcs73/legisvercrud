@@ -1,4 +1,4 @@
-@extends('welcome')
+@extends('index')
 @section('titulo',"Editando datos de ")
 @section('subtitulo',$diputado->nombreDiputado )
 @section('Contenido')
@@ -47,11 +47,11 @@
 			<select class="custom-select" name="idDistrito">
 					<option>Seleccione</option>
 					@foreach ($distritos as $distrito)
+						@php ($seleccionado="")
 						@if($distrito->idDistrito==$diputado->idDistrito)
-							<option selected value="{{ $distrito->idDistrito }}">{{ $distrito->nombre }}</option>
-						@else
-							<option value="{{ $distrito->idDistrito }}">{{ $distrito->nombre }}</option>
+							@php ($seleccionado='selected')
 						@endif
+						<option {{ $seleccionado }} value="{{ $distrito->idDistrito }}">{{ $distrito->nombre }}</option>
 					@endforeach
 			</select>
 		</div>
@@ -84,7 +84,6 @@
 						@if($diputado->suplenteDe==$propietario->idDiputado)
 							@php ($seleccionado = 'selected')
 						@endif
-						
 							<option {{ $activado }} {{ $seleccionado }} value="{{ $propietario->idDiputado }}">{{ $propietario->nombreDiputado }}</option>
 						{{-- @else --}}
 							{{-- <option {{ $activado }} value="{{ $propietario->idDiputado }}">{{ $propietario->nombreDiputado }}</option> --}}
@@ -100,7 +99,7 @@
 		<div class="col-auto">
 			<div class="form-group">
 				{{--  <label>Guardar</label>  --}}
-				<button id="btnGuardar" name="btnGuardar" class="btn btn-primary"><span class="oi oi-check"></span></button>
+				<button id="btnGuardar" name="" class="btn btn-primary"><span class="oi oi-check"></span></button>
 			</div>
 		</div>
 	</div>

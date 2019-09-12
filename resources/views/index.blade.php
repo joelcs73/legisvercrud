@@ -14,17 +14,18 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-        {{--  <link rel="stylesheet" href="https://bootswatch.com/4/cosmo/bootstrap.css">  --}}
+
+         {{-- <link rel="stylesheet" href="https://bootswatch.com/4/cosmo/bootstrap.css">  --}}
         <link rel="stylesheet" href="https://bootswatch.com/4/lumen/bootstrap.css">
-        {{--  <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css">  --}}
-        {{--  <link rel="stylesheet" href="https://bootswatch.com/4/solar/bootstrap.css">  --}}
+         {{-- <link rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css">  --}}
+         {{-- <link rel="stylesheet" href="https://bootswatch.com/4/solar/bootstrap.css">  --}}
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" />
     </head>
     <body>
       <div class="container">
           @include('menu')
-          <h5>@yield('titulo')<span class="badge badge-dark">@yield('subtitulo')</span></h5>
+          <h4>@yield('titulo')<span class="badge badge-dark">@yield('subtitulo')</span></h4>
           @yield('Contenido')
       </div>
     </body>

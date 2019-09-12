@@ -9,15 +9,15 @@
         <li class="nav-item dropdown ">
           <a class="nav-link dropdown-toggle" href="/" id="menu1" data-toggle="dropdown">API's</a>
             <div class="dropdown-menu dropdown-menu-left" aria-labelledby="menu1">
-              <a class="dropdown-item" target="_blank" href="/api/diputados">Cat. Diputados</a> 
-              <a class="dropdown-item" target="_blank" href="/api/areas">Cat. áreas</a> 
-              <a class="dropdown-item" target="_blank" href="/api/comisiones">Cat. comisiones</a>
-              <a class="dropdown-item" target="_blank" href="/api/distritos">Cat. distritos</a>
-              <a class="dropdown-item" target="_blank" href="/api/partidospoliticos">Cat. partidos políticos</a>
-              <a class="dropdown-item" target="_blank" href="/api/legislaturas">Cat. legislaturas</a>
+              <a class="dropdown-item" target="_blank" href="/api/areas">Areas</a> 
+              <a class="dropdown-item" target="_blank" href="/api/comisiones">Comisiones</a>
+              <a class="dropdown-item" target="_blank" href="/api/diputados">Diputados</a> 
+              <a class="dropdown-item" target="_blank" href="/api/distritos">Distritos</a>
+              <a class="dropdown-item" target="_blank" href="/api/legislaturas">Legislaturas</a>
+              <a class="dropdown-item" target="_blank" href="/api/mesadirectiva">Mesa Directiva</a>
+              <a class="dropdown-item" target="_blank" href="/api/partidospoliticos">Partidos políticos</a>
               <div class="dropdown-divider"></div> 
               <a class="dropdown-item" target="_blank" href="/api/diputadoslegislatura">Diputados Legislatura actual</a>
-              <a class="dropdown-item" target="_blank" href="/api/mesadirectiva">Mesa directiva</a>
             </div>
         </li>
 
