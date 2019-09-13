@@ -30,7 +30,9 @@
         <tbody>
             @php ($num = 1)
             @foreach ($diputados as $diputado)
-                <tr class="">
+                @php ($clase="")
+                @if($diputado->id==NULL) @php ($clase="table-danger") @endif
+                <tr class="{{ $clase }}">
                     <th>{{ $num }}</th>
                     {{--  <th>{{ $diputado->id }}</th>  --}}
                     {{--  <th>{{ $diputado->idDiputado }}</th>  --}}
@@ -39,6 +41,7 @@
                     <td>{{ $diputado->nombrePartido }}</td>
                     <td>{{ $diputado->nombreDiputado }}</td>
                     {{-- <td>{{ $diputado->tipoDeEleccion }}</td> --}}
+                @if($diputado->id!=NULL)
                     <td class="text-center">
                             <a class="btn btn-outline-dark" href="{{ route('diputado.edita', ['diputado' => $diputado->idDiputado]) }}">
                                 <span class="oi oi-pencil"></span>
@@ -49,6 +52,10 @@
                             <span class="oi oi-loop-circular"></span>
                         </a>
                     </td>
+                @else
+                    <td></td>
+                    <td></td>
+                @endif
                 </tr>
                 @php ($num ++)
             @endforeach

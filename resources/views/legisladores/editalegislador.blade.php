@@ -1,5 +1,7 @@
 @extends('index')
 @section('titulo',"Editando datos de ")
+
+{{-- @dd($diputado) --}}
 @section('subtitulo',$diputado->nombreDiputado )
 @section('Contenido')
 <form action="/guardalegislador/{{ $diputado->idDiputado }}">
@@ -61,34 +63,38 @@
 		</div>
 		<div class="form-group col-sm-12 col-md-4">
 			<label >Archivo Fotografía (jpg)</label>
-			{{-- <label class="custom-file-label" for="customFileLang">Seleccionar Archivo</label> --}}
-			{{-- <input type="file" class="custom-file-input" id="customFileLang" lang="es"> --}}
-
-
 			<input type="text" name="foto" id="txtFoto" class="form-control input" value="{{ $diputado->foto }}">
 		</div>
 	</div>
 	<hr>
 	<div class="row">
-		<div class="form-group col-sm-12 col-md-4">
-			<label>Es suplente de:</label>
+		<div class="form-group col-sm-12 col-md-4" >
+			<label>Tipo de cargo:</label>
+
 			@php ($activado='')
-			@if($diputado->tipoDeCargo=='Propietario')
+			@php ($nombrePropietario='')
+			@php ($tipoCargo=$diputado->tipoDeCargo)
+			@if($tipoCargo=='Propietario')
 				@php ($activado='disabled')
 			@endif
-			
-			<select class="custom-select" name="suplenteDe">
-					<option value=0>Es propietario</option>
-					@foreach ($diputados as $propietario)
-						@php ($seleccionado = '')
-						@if($diputado->suplenteDe==$propietario->idDiputado)
-							@php ($seleccionado = 'selected')
-						@endif
-							<option {{ $activado }} {{ $seleccionado }} value="{{ $propietario->idDiputado }}">{{ $propietario->nombreDiputado }}</option>
-						{{-- @else --}}
-							{{-- <option {{ $activado }} value="{{ $propietario->idDiputado }}">{{ $propietario->nombreDiputado }}</option> --}}
-					@endforeach
+				
+			<select class="custom-select" name="suplenteDe" hidden>
+				<option value=0>Es propietario</option>
+				@foreach ($diputadosPropietarios as $propietario)
+					@php ($seleccionado = '')
+					@if($diputado->suplenteDe==$propietario->idDiputado)
+						@php ($seleccionado = 'selected')
+						@php ($nombrePropietario=$propietario->nombreDiputado)
+					@endif
+					<option {{ $activado }} {{ $seleccionado }} value="{{ $propietario->idDiputado }}">{{ $propietario->nombreDiputado }}</option>
+				@endforeach
 			</select>
+					
+			@if($tipoCargo!='Propietario')
+				@php ($tipoCargo = 'Suplente de '.$nombrePropietario)
+			@endif
+			<label><strong>{{ $tipoCargo }}</strong></label>
+
 		</div>
 		<div class="form-group col-sm-12 col-md-4" hidden>
 			<label >OrdenNivel</label>

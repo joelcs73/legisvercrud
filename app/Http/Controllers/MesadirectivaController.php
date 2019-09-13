@@ -19,11 +19,9 @@ class MesadirectivaController extends Controller
         $oDiputadosLegislatura = new DiputadosLegislaturaController();
         $numleg = $oLegislatura->ultimaLegislatura();
         $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg],
             ['cat_diputados.cargo', 'like', '%mesa directiva%']
         ];
-        $mesadirectiva=$oDiputadosLegislatura->diputadosLegislaturaJson($condiciones);
+        $mesadirectiva=$oDiputadosLegislatura->distritosOcupados($condiciones,$numleg);
         echo json_encode($mesadirectiva);
     }
 
@@ -60,11 +58,9 @@ class MesadirectivaController extends Controller
             $oDiputadosLegislatura = new DiputadosLegislaturaController();
             $numleg = $oLegislatura->ultimaLegislatura();
             $condiciones = [
-                ['diputadoslegislatura.status','=',1],
-                ['cat_legislaturas.clave','=',$numleg],
                 ['cat_diputados.cargo', 'like', '%mesa directiva%']
             ];
-            $mesadirectiva=$oDiputadosLegislatura->diputadosLegislaturaJson($condiciones);
+            $mesadirectiva=$oDiputadosLegislatura->distritosOcupados($condiciones,$numleg);
             return view('/legisladores/mesadirectiva')
             ->with('diputados',$mesadirectiva);
     }

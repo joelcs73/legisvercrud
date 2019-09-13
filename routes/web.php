@@ -26,14 +26,15 @@ Route::get('/', function () {
 // Route::get('/menu','UsuarioController@opcionesmenu');
 
 
-Route::get('/legisladores/','DiputadoController@showweb');
+Route::get('/legisladores/','DiputadosLegislaturaController@showweb');
 
 Route::get('/legisladores/licencia/{idDiputado}','DiputadosLegislaturaController@licencia')->name('diputado.licencia');
+Route::get('/legisladores/edita/{idDiputado}','DiputadoController@edita')->name('diputado.edita');
+Route::get('/legisladores/mesadirectiva','MesaDirectivaController@show');
+
+Route::get('/guardalegislador/{idDiputado}','DiputadoController@actualiza');
 Route::get('/guardalicencia','DiputadosLegislaturaController@guardalicencia');
 
-Route::get('/legisladores/edita/{idDiputado}','DiputadoController@edita')->name('diputado.edita');
-Route::get('/guardalegislador/{idDiputado}','DiputadoController@actualiza');
 
-Route::get('/legisladores/mesadirectiva','MesaDirectivaController@show');
 
 

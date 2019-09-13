@@ -11,6 +11,7 @@
             {{--  <th scope="col">idDiputadoLegislatura</th>  --}}
             {{--  <th scope="col">idDiputado</th>  --}}
             <th scope="col">Diputado(a)</th>
+            <th scope="col">Cargo</th>
             <th scope="col">Partido</th>
             <th scope="col">Distrito</th>
             <th scope="col">Tipo de elección</th>
@@ -26,6 +27,7 @@
                     {{--  <th>{{ $diputado->id }}</th>  --}}
                     {{--  <th>{{ $diputado->idDiputado }}</th>  --}}
                     <th>{{ $diputado->nombreDiputado }}</th>
+                    <td>{{ $diputado->cargo }}</td>
                     <td>{{ $diputado->nombrePartido }}</td>
                     <td>{{ $diputado->nombreDistrito }}</td>
                     <td>{{ $diputado->tipoDeEleccion }}</td>

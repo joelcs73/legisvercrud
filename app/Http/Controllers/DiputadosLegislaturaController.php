@@ -30,12 +30,25 @@ class DiputadosLegislaturaController extends Controller
      */
     public function show($numleg)
     {
-        $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg]];
-            $diputados=$this->diputadosLegislaturaJson($condiciones);
+        $condiciones = [];
+            // $diputados=$this->diputadosLegislaturaJson($condiciones);
+            // $condiciones = " diputadoslegislatura.status = 1 and cat_legislaturas.clave = '".$numleg."'";
+            $diputados=$this->distritosOcupados($condiciones,$numleg);
             echo json_encode($diputados);
     }
+
+    public function showweb()
+    {   
+        $oDl = new DiputadosLegislaturaController();
+        $claveLeg = DB::table('cat_legislaturas')
+        ->orderBy('idLegislatura','desc')
+        ->first();
+        $numleg = (string) $claveLeg->clave;
+            $condiciones = [];
+            $dips = $this->distritosOcupados($condiciones,$numleg);
+            return view('/legisladores/diputadoslegislatura')
+            ->with('diputados',$dips);
+        }
 
     /**
      * Store a newly created resource in storage.
@@ -55,8 +68,7 @@ class DiputadosLegislaturaController extends Controller
         echo json_encode($diplegis);
     }
 
-
-        
+      
 
     /**
      * Update the specified resource in storage.
@@ -89,11 +101,20 @@ class DiputadosLegislaturaController extends Controller
         $diplegis->delete();
     }
 
-    public function distritosOcupados($condiciones){
-        $dl = DB::table('diputadoslegislatura')
-        ->leftjoin('cat_legislaturas', 'diputadoslegislatura.idLegislatura', '=', 'cat_legislaturas.idLegislatura')
-        ->leftjoin('cat_diputados', 'diputadoslegislatura.idDiputado', '=', 'cat_diputados.idDiputado')
-        ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
+    public function distritosOcupados($condiciones,$legislatura,$status=1){
+        $dl = DB::table('cat_distritos')
+        ->leftjoin(DB::raw("(select diputadoslegislatura.id, diputadoslegislatura.idLegislatura, diputadoslegislatura.idDiputado,
+                diputadoslegislatura.idPartido,
+                diputadoslegislatura.status,
+                diputadoslegislatura.permanente,
+                CONCAT(cat_diputados.nombre,' ',cat_diputados.paterno,' ',cat_diputados.materno) AS nombreDiputado,
+                cat_diputados.idDistrito
+            FROM cat_diputados LEFT JOIN diputadoslegislatura ON cat_diputados.idDiputado = diputadoslegislatura.idDiputado
+            LEFT JOIN cat_legislaturas ON cat_legislaturas.idLegislatura = diputadoslegislatura.idLegislatura
+            WHERE diputadoslegislatura.status = $status and cat_legislaturas.clave = $legislatura
+            ORDER BY cat_diputados.idDistrito) AS diputadoslegislatura"), 'diputadoslegislatura.idDistrito', '=', 'cat_distritos.idDistrito')
+        ->leftjoin('cat_legislaturas', 'cat_legislaturas.idLegislatura', '=' ,'diputadoslegislatura.idLegislatura')
+        ->leftjoin('cat_diputados','diputadoslegislatura.idDiputado','=','cat_diputados.idDiputado')
         ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
         ->select(
             'diputadoslegislatura.id',
@@ -102,22 +123,22 @@ class DiputadosLegislaturaController extends Controller
             'diputadoslegislatura.idPartido',
             'diputadoslegislatura.status',
             'diputadoslegislatura.permanente',
-            'cat_legislaturas.nombre as legislatura', 
-            'cat_legislaturas.clave as numeroLegislatura', 
+            'cat_legislaturas.nombre AS legislatura',
+            'cat_legislaturas.clave AS numeroLegislatura',
             'cat_diputados.paterno',
             'cat_diputados.materno',
             'cat_diputados.nombre',
-            DB::raw('CONCAT(cat_diputados.paterno," ",cat_diputados.materno," ",cat_diputados.nombre) as nombreDiputado'),
-            DB::raw('(
-                case
-                    when cat_diputados.suplenteDe = 0 then "Propietario"
-                    else "Suplente"
-                end) as tipoDeCargo'),
-            DB::raw('(
-                case
-                    when cat_distritos.numero = 99 then "Representación proporcional"
-                    else "Mayoría relativa"
-                end) as tipoDeEleccion'),
+            DB::raw('CONCAT(cat_diputados.paterno," ",cat_diputados.materno," ",cat_diputados.nombre) AS nombreDiputado'),
+            DB::raw('(CASE
+                WHEN diputadoslegislatura.idDiputado IS NULL THEN "SIN REPRESENTACIÓN"
+                WHEN cat_diputados.suplenteDe = 0 THEN "Propietario"
+                ELSE "Suplente"
+            END) AS tipoDeCargo'),
+            DB::raw('(CASE
+                WHEN diputadoslegislatura.idDiputado IS NULL THEN "SIN REPRESENTACIÓN"
+                WHEN cat_distritos.numero = 99 THEN "Representación proporcional"
+                ELSE "Mayoría relativa"
+            END) AS tipoDeEleccion'),
             'cat_diputados.cargo',
             'cat_diputados.foto',
             'cat_diputados.extension',
@@ -126,67 +147,14 @@ class DiputadosLegislaturaController extends Controller
             'cat_diputados.idDistrito',
             'cat_diputados.suplenteDe',
             'cat_diputados.ordenNivel',
-            'cat_distritos.numero as numeroDistrito',
-            DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) as nombreDistrito'),
-            'cat_partidospoliticos.siglas as siglasPartido',
-            'cat_partidospoliticos.nombre as nombrePartido',
-            'cat_partidospoliticos.archivoimagen as logoPartido'
+            'cat_distritos.numero AS numeroDistrito',
+            DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) AS nombreDistrito'),
+            'cat_partidospoliticos.siglas AS siglasPartido',
+            'cat_partidospoliticos.nombre AS nombrePartido',
+            'cat_partidospoliticos.archivoimagen AS logoPartido'
             )
         ->where($condiciones)
         ->orderBy('cat_distritos.numero')
-        ->orderBy('cat_diputados.nombre')
-        ->get();
-
-        return $dl;
-    }
-
-    public function diputadosLegislaturaJson($condiciones){
-        $dl = DB::table('diputadoslegislatura')
-        ->leftjoin('cat_legislaturas', 'diputadoslegislatura.idLegislatura', '=', 'cat_legislaturas.idLegislatura')
-        ->leftjoin('cat_diputados', 'diputadoslegislatura.idDiputado', '=', 'cat_diputados.idDiputado')
-        ->leftjoin('cat_partidospoliticos', 'diputadoslegislatura.idPartido', '=', 'cat_partidospoliticos.idPartido')
-        ->leftjoin('cat_distritos', 'cat_diputados.idDistrito', '=', 'cat_distritos.idDistrito')
-        ->select(
-            'diputadoslegislatura.id',
-            'cat_legislaturas.idLegislatura',
-            'diputadoslegislatura.idDiputado',
-            'diputadoslegislatura.idPartido',
-            'diputadoslegislatura.status',
-            'diputadoslegislatura.permanente',
-            'cat_legislaturas.nombre as legislatura', 
-            'cat_legislaturas.clave as numeroLegislatura', 
-            'cat_diputados.paterno',
-            'cat_diputados.materno',
-            'cat_diputados.nombre',
-            DB::raw('CONCAT(cat_diputados.nombre," ",cat_diputados.paterno," ",cat_diputados.materno) as nombreDiputado'),
-            DB::raw('(
-                case
-                    when cat_diputados.suplenteDe = 0 then "Propietario"
-                    else "Suplente"
-                end) as tipoDeCargo'),
-            DB::raw('(
-                case
-                    when cat_distritos.numero = 99 then "Representación proporcional"
-                    else "Mayoría relativa"
-                end) as tipoDeEleccion'),
-            'cat_diputados.cargo',
-            'cat_diputados.foto',
-            'cat_diputados.extension',
-            'cat_diputados.correo',
-            'cat_diputados.cvPdf',
-            'cat_diputados.idDistrito',
-            'cat_diputados.suplenteDe',
-            'cat_diputados.ordenNivel',
-            'cat_distritos.numero as numeroDistrito',
-            DB::raw('CONCAT(cat_distritos.clave," ",cat_distritos.nombre) as nombreDistrito'),
-            'cat_partidospoliticos.siglas as siglasPartido',
-            'cat_partidospoliticos.nombre as nombrePartido',
-            'cat_partidospoliticos.archivoimagen as logoPartido'
-            )
-        ->where($condiciones)
-        ->orderBy('cat_partidospoliticos.orden')
-        ->orderBy('cat_diputados.ordenNivel')
-        ->orderBy('cat_diputados.paterno')
         ->get();
 
         return $dl;
@@ -198,8 +166,8 @@ class DiputadosLegislaturaController extends Controller
         // Obtenemos de la tabla [diputadoslegislatura] los datos del diputado que se irá de licencia
         $oLegislatura = new LegislaturaController();
         $numleg = $oLegislatura->ultimaLegislatura();
-        $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $idDip]];
-        $diputadoSale = $this->diputadosLegislaturaJson($condiciondiputado)->first();
+        $condiciondiputado = [['cat_diputados.idDiputado', '=', $idDip]];
+        $diputadoSale = $this->distritosOcupados($condiciondiputado,$numleg)->first();
         if(empty($diputadoSale)){ return view('rutainvalida'); }
         if($diputadoSale->status==0){ return view('rutainvalida'); }
 
@@ -208,27 +176,25 @@ class DiputadosLegislaturaController extends Controller
             // Aquí el diputado saliente es Propietario
 
             // Obtenemos el diputado que es su suplente
-            $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
-            $diputadoEntra = $this->diputadosLegislaturaJson($condiciondiputado)->first();
+            $condiciondiputado = [['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
+            $diputadoEntra = $this->distritosOcupados($condiciondiputado,$numleg)->first();
             if(empty($diputadoEntra)){
                 $diputadoEntraYaHaOcupadoCurul = false;
                 $diputadoEntra = DB::table('cat_diputados')->select('cat_diputados.*')->where('suplenteDe','=',$idDip)->get()->first();
             }
-
         } else { 
             // Aquí el diputado saliente es Suplente
-
+            
             // Obtenemos el diputado que es propietario
-            $condiciondiputado = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
-            $diputadoEntra = $this->diputadosLegislaturaJson($condiciondiputado)->first();
-
+            $condiciondiputado = [['cat_diputados.idDiputado', '=', $diputadoSale->suplenteDe]];
+            $diputadoEntra = $this->distritosOcupados($condiciondiputado,$numleg,0)->first();
         }
+        // dd($diputadoSale,$diputadoEntra,$diputadoEntraYaHaOcupadoCurul);
         return view('legisladores/gestionalicencia',
             [
                 'diputadoSale' => $diputadoSale,
                 'diputadoEntra' => $diputadoEntra,
                 'diputadoEntraYaHaOcupadoCurul' => $diputadoEntraYaHaOcupadoCurul
-
             ]
         );
     }
@@ -251,6 +217,7 @@ class DiputadosLegislaturaController extends Controller
         
         // Cambiamos el estatus del diputado saliente a 0
         $objDipSaliente = DiputadosLegislatura::find($idRegistro);
+        // $objDipSaliente = new DiputadosLegislatura();
         $objDipSaliente->idLegislatura = $idLegislatura;
         $objDipSaliente->idDiputado = $idDipSaliente;
         $objDipSaliente->idPartido = $idPartido;

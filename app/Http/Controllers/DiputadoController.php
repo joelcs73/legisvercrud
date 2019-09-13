@@ -25,24 +25,6 @@ class DiputadoController extends Controller
         echo json_encode($diputados);
     }
 
-    public function showweb()
-    {   
-        $oDl = new DiputadosLegislaturaController();
-        $claveLeg = DB::table('cat_legislaturas')
-        ->orderBy('idLegislatura','desc')
-        ->first();
-        $numleg = (string) $claveLeg->clave;
-        
-        $condiciones = [
-            ['diputadoslegislatura.status','=',1],
-            ['cat_legislaturas.clave','=',$numleg]];
-            $dips = $oDl->distritosOcupados($condiciones);
-            
-            return view('/legisladores/diputadoslegislatura')
-            ->with('diputados',$dips);
-        }
-
-
     /**
      * Store a newly created resource in storage.
      *
@@ -113,10 +95,11 @@ class DiputadoController extends Controller
         $oLegislatura = new LegislaturaController();
         $oDiputadosLegislatura = new DiputadosLegislaturaController();
         $numleg = $oLegislatura->ultimaLegislatura();
-        $condiciondiputado = [['diputadoslegislatura.status','=',1],['cat_legislaturas.clave','=',$numleg],['cat_diputados.idDiputado', '=', $idDip]];
-        $condicionPropietarios = [['cat_legislaturas.clave','=',$numleg],['cat_diputados.suplenteDe','=',0]];
-        $diputado=$oDiputadosLegislatura->diputadosLegislaturaJson($condiciondiputado)->first();
-        $diputadosPropietarios=$oDiputadosLegislatura->diputadosLegislaturaJson($condicionPropietarios);
+        $condiciondiputado = [['cat_diputados.idDiputado', '=', $idDip]];
+        $condicionPropietarios = [['cat_diputados.suplenteDe','=',0]];
+
+        $diputado=$oDiputadosLegislatura->distritosOcupados($condiciondiputado,$numleg)->first();
+        $diputadosPropietarios=$oDiputadosLegislatura->distritosOcupados($condicionPropietarios,$numleg,0);
 
         if(empty($diputado)){
             return view('rutainvalida');
@@ -124,11 +107,12 @@ class DiputadoController extends Controller
 
         $oDist = new DistritoController();
         $distritos = $oDist->index();
-
+        
+        // dd($diputado);
         return view('legisladores/editalegislador',
             [
                 'diputado' => $diputado,
-                'diputados' => $diputadosPropietarios,
+                'diputadosPropietarios' => $diputadosPropietarios,
                 'distritos' => $distritos
             ]
         );
