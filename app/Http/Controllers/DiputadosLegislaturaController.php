@@ -30,7 +30,9 @@ class DiputadosLegislaturaController extends Controller
      */
     public function show($numleg)
     {
-        $condiciones = [];
+        $condiciones = [
+            ['diputadoslegislatura.id', '!=', null]
+        ];
             // $diputados=$this->diputadosLegislaturaJson($condiciones);
             // $condiciones = " diputadoslegislatura.status = 1 and cat_legislaturas.clave = '".$numleg."'";
             $diputados=$this->distritosOcupados($condiciones,$numleg);
