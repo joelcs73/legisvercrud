@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class DiputadosLegislaturaController extends Controller
 {
+
+    private $orderby="cat_distritos.numero";
+    public function setOrderBy($order) { $this->orderby=$order;}
     /**
      * Display a listing of the resource.
      *
@@ -30,23 +33,18 @@ class DiputadosLegislaturaController extends Controller
      */
     public function show($numleg)
     {
-        $condiciones = [
-            ['diputadoslegislatura.id', '!=', null]
-        ];
-            // $diputados=$this->diputadosLegislaturaJson($condiciones);
-            // $condiciones = " diputadoslegislatura.status = 1 and cat_legislaturas.clave = '".$numleg."'";
-            $diputados=$this->distritosOcupados($condiciones,$numleg);
-            echo json_encode($diputados);
+        $condiciones = 'diputadoslegislatura.id is not null';
+        $diputados=$this->distritosOcupados($condiciones,$numleg);
+        echo json_encode($diputados);
     }
 
     public function showweb()
     {   
-        $oDl = new DiputadosLegislaturaController();
         $claveLeg = DB::table('cat_legislaturas')
         ->orderBy('idLegislatura','desc')
         ->first();
         $numleg = (string) $claveLeg->clave;
-            $condiciones = [];
+            $condiciones = 'diputadoslegislatura.id is not null';
             $dips = $this->distritosOcupados($condiciones,$numleg);
             return view('/legisladores/diputadoslegislatura')
             ->with('diputados',$dips);
@@ -104,6 +102,7 @@ class DiputadosLegislaturaController extends Controller
     }
 
     public function distritosOcupados($condiciones,$legislatura,$status=1){
+        // dd($this->orderby);
         $dl = DB::table('cat_distritos')
         ->leftjoin(DB::raw("(select diputadoslegislatura.id, diputadoslegislatura.idLegislatura, diputadoslegislatura.idDiputado,
                 diputadoslegislatura.idPartido,
@@ -155,8 +154,8 @@ class DiputadosLegislaturaController extends Controller
             'cat_partidospoliticos.nombre AS nombrePartido',
             'cat_partidospoliticos.archivoimagen AS logoPartido'
             )
-        ->where($condiciones)
-        ->orderBy('cat_distritos.numero')
+        ->whereRaw($condiciones)
+        ->orderByRaw($this->orderby)
         ->get();
 
         return $dl;

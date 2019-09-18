@@ -26,6 +26,10 @@ Route::resource('legislaturas','LegislaturaController');
 Route::resource('mesadirectiva','MesaDirectivaController');
 Route::resource('partidospoliticos','PartidoPoliticoController');
 Route::resource('diputadoslegislatura','DiputadosLegislaturaController');
+Route::resource('juntadecoordinacionpolitica','JuntaCoordinacionPoliticaController');
+Route::resource('juntadetrabajoslegislativos','JuntaTrabajosLegislativosController');
+
+
 // Route::get('diputadoslegislatura/{numleg}', function ($numleg){
 //     DiputadosLegislaturaController::show($numleg);
 // });

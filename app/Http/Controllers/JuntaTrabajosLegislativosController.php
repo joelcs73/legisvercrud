@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\JuntaTrabajosLegislativos;
 use Illuminate\Http\Request;
-use App\Http\Controllers\DiputadosLegislaturaController;
-use App\Http\Controllers\LegislaturaController;
+use Illuminate\Support\Facades\DB;
 
-class MesadirectivaController extends Controller
+class JuntaTrabajosLegislativosController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,8 +18,8 @@ class MesadirectivaController extends Controller
         $oLegislatura = new LegislaturaController();
         $oDiputadosLegislatura = new DiputadosLegislaturaController();
         $numleg = $oLegislatura->ultimaLegislatura();
-        $condiciones = 'cat_diputados.ordenNivel>=1 and cat_diputados.ordenNivel<=3';
-        $oDiputadosLegislatura->setOrderBy('cat_diputados.ordenNivel');
+        $condiciones = 'cat_diputados.ordenNivel = 0 or cat_diputados.ordenNivel = 1 or cat_diputados.ordenNivel = 4';
+        $oDiputadosLegislatura->setOrderBy('cat_partidospoliticos.orden, cat_diputados.ordenNivel');
         $mesadirectiva=$oDiputadosLegislatura->distritosOcupados($condiciones,$numleg);
         echo json_encode($mesadirectiva);
     }
@@ -48,28 +48,21 @@ class MesadirectivaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\JuntaTrabajosLegislativos  $juntaTrabajosLegislativos
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show(JuntaTrabajosLegislativos $juntaTrabajosLegislativos)
     {
-            $oLegislatura = new LegislaturaController();
-            $oDiputadosLegislatura = new DiputadosLegislaturaController();
-            $numleg = $oLegislatura->ultimaLegislatura();
-            $condiciones = 'cat_diputados.ordenNivel>=1 and cat_diputados.ordenNivel<=3';
-            $oDiputadosLegislatura->setOrderBy('cat_diputados.ordenNivel');
-            $mesadirectiva=$oDiputadosLegislatura->distritosOcupados($condiciones,$numleg);
-            return view('/legisladores/mesadirectiva')
-            ->with('diputados',$mesadirectiva);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\JuntaTrabajosLegislativos  $juntaTrabajosLegislativos
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(JuntaTrabajosLegislativos $juntaTrabajosLegislativos)
     {
         //
     }
@@ -78,10 +71,10 @@ class MesadirectivaController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\JuntaTrabajosLegislativos  $juntaTrabajosLegislativos
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, JuntaTrabajosLegislativos $juntaTrabajosLegislativos)
     {
         //
     }
@@ -89,10 +82,10 @@ class MesadirectivaController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\JuntaTrabajosLegislativos  $juntaTrabajosLegislativos
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(JuntaTrabajosLegislativos $juntaTrabajosLegislativos)
     {
         //
     }

@@ -13,6 +13,8 @@
               <a class="dropdown-item" target="_blank" href="/api/comisiones">Comisiones</a>
               <a class="dropdown-item" target="_blank" href="/api/diputados">Diputados</a> 
               <a class="dropdown-item" target="_blank" href="/api/distritos">Distritos</a>
+              <a class="dropdown-item" target="_blank" href="/api/juntadecoordinacionpolitica">Junta de Coordinación Política</a>
+              <a class="dropdown-item" target="_blank" href="/api/juntadetrabajoslegislativos">Junta de Trabajos Legislativos</a>
               <a class="dropdown-item" target="_blank" href="/api/legislaturas">Legislaturas</a>
               <a class="dropdown-item" target="_blank" href="/api/mesadirectiva">Mesa Directiva</a>
               <a class="dropdown-item" target="_blank" href="/api/partidospoliticos">Partidos políticos</a>
